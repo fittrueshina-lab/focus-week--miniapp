@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+<head>
+<meta charset="utf-8"/><meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&amp;family=Manrope:wght@500;600;700&amp;family=Share+Tech+Mono&amp;display=swap" rel="stylesheet"/>
+<title>ДЕРЖИ FOCUS НА СЕБЕ</title>
+<style>
+*{box-sizing:border-box}html{background:#080414}body{margin:0;color:#f6f0ff;background:radial-gradient(circle at 90% 5%,#182367 0,transparent 34%),radial-gradient(circle at 5% 70%,#51134d 0,transparent 38%),linear-gradient(#0a061d,#160827);font:15px/1.45 Manrope,sans-serif;min-height:100vh}
+main{max-width:560px;margin:auto;padding:28px 16px 60px}.tag{font:12px "Share Tech Mono";letter-spacing:.18em;color:#b07cff;margin-bottom:8px}h1{margin:0 0 24px;color:#fff}.focusinline{font:700 29px/1.08 Unbounded;color:#fff;letter-spacing:-.04em}.focusword{display:block;font:700 42px/1 Unbounded;letter-spacing:-.04em}.smalltitle{display:block;margin-top:7px;font:600 16px/1.2 Manrope;letter-spacing:.04em;color:#d9ccec}h2{font-size:11px;letter-spacing:.16em;color:#9d91c2;margin:34px 0 11px}
+.card{border:1px solid rgba(255,255,255,.14);border-radius:24px;padding:19px;margin-bottom:12px;background:linear-gradient(145deg,rgba(255,255,255,.1),rgba(255,255,255,.035));box-shadow:0 18px 45px rgba(0,0,0,.3)}
+.goalheads{display:flex;justify-content:space-between}.cap{font-size:11px;color:#9d91c2;font-weight:700}.kg{font:25px "Share Tech Mono";color:#fff}.right{text-align:right}
+.track{height:92px;position:relative;margin:17px 9px 0}.base,.fill{position:absolute;top:43px;left:0;height:5px;border-radius:9px}.base{right:0;background:rgba(255,255,255,.14)}.fill{width:36%;background:linear-gradient(90deg,#885bf2,#ec4899)}
+.old,.now,.goal{position:absolute;top:45px;transform:translate(-50%,-50%);border-radius:50%}.old{width:9px;height:9px;background:#a18ab8;opacity:.38}.now{left:36%;width:27px;height:27px;background:linear-gradient(135deg,#fff,#b07cff 58%,#ff5fa8);border:3px solid #fff;box-shadow:0 0 22px #9d65ff}.goal{left:100%;width:17px;height:17px;border:3px solid #ff5fa8}.lab{position:absolute;left:36%;top:3px;transform:translateX(-50%);font:16px "Share Tech Mono";white-space:nowrap}.meta{display:flex;justify-content:space-between;color:#9d91c2;font-size:12px}.meta b{color:#fff}.mot{margin-top:14px;border-radius:16px;padding:13px;background:rgba(176,124,255,.1);border:1px solid rgba(176,124,255,.2)}.mot b{display:block;color:#fff}.mot span{font-size:12px;color:#9d91c2}
+.weektop{display:flex;justify-content:space-between;align-items:end}.big{font:44px "Share Tech Mono"}.muted{font-size:12px;color:#9d91c2}.dots{display:flex;gap:7px;margin-top:17px}.dot{width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,.18)}.dot.on{border:0;background:linear-gradient(135deg,#b07cff,#ff5fa8)}.dot.cur{box-shadow:0 0 0 2px rgba(255,255,255,.5)}
+.win{display:grid;grid-template-columns:1fr 1fr;gap:9px}.mini{padding:13px;border-radius:17px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09)}.mini .v{font:22px "Share Tech Mono";margin:4px 0}.up{color:#3dffa8;font:12px "Share Tech Mono"}.down{color:#ffc95e;font:12px "Share Tech Mono"}
+.reporttitle{display:flex;justify-content:space-between;align-items:center}.week{font:17px "Share Tech Mono"}.row{padding:13px 0;border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;gap:15px}.row:last-child{border:0}.row span{color:#9d91c2}.row b{font-family:"Share Tech Mono";font-weight:400}.button{margin-top:15px;text-align:center;padding:15px;border-radius:99px;background:linear-gradient(90deg,#8b5cf6,#ec4899);font-weight:700}
+
+.toggle{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:5px;border-radius:15px;background:rgba(255,255,255,.055);margin-bottom:15px}
+.toggle button{border:0;border-radius:11px;padding:11px 8px;background:transparent;color:#8f82b2;font:700 12px Manrope;letter-spacing:.06em}
+.toggle button.active{background:linear-gradient(90deg,#8b5cf6,#ec4899);color:#fff;box-shadow:0 7px 20px rgba(139,92,246,.25)}
+#fatPanel{display:none}
+
+.topline{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+.topline .tag{margin-bottom:0}
+.signature{font:11px "Share Tech Mono";letter-spacing:.06em;color:#c9b9e7;opacity:.86}
+.brand{text-align:center;margin:4px 0 27px}
+.brand-line{display:flex;justify-content:center;align-items:baseline;gap:10px;white-space:nowrap}
+.smallword{font:600 17px Manrope;color:#d4c9e2}
+.focusword{font:700 clamp(55px,17vw,84px)/.9 Unbounded;color:#fff;letter-spacing:-.075em;text-shadow:0 0 32px rgba(176,124,255,.28)}
+.underword{font:600 16px Manrope;color:#d4c9e2;letter-spacing:.1em;margin-top:8px;padding-left:52px}
+.quoteCard{position:relative;overflow:hidden;padding:17px 18px 16px}
+.quoteCard:before{content:"“";position:absolute;right:14px;top:-19px;font:700 76px Georgia;color:rgba(176,124,255,.12)}
+.quoteLabel{font:10px "Share Tech Mono";letter-spacing:.15em;color:#ad8de2;margin-bottom:7px}
+.quoteText{position:relative;font:600 16px/1.45 Manrope;color:#fff;max-width:91%}
+.quoteDots{display:flex;gap:5px;margin-top:12px}
+.quoteDots i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.18)}
+.quoteDots i.on{width:18px;border-radius:5px;background:linear-gradient(90deg,#8b5cf6,#ec4899)}
+
+
+.trendBox{margin-top:14px;padding:14px;border-radius:17px;background:rgba(61,255,168,.055);border:1px solid rgba(61,255,168,.16)}
+.trendHead{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.trendHead b{font-size:13px;color:#fff}.trendValue{font:14px "Share Tech Mono";color:#3dffa8}
+.trendBox p{margin:7px 0 0;color:#a99dc5;font-size:12px}
+.scale{display:flex;gap:7px;margin-top:11px}.scale i{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;font:12px "Share Tech Mono";font-style:normal;border:1px solid rgba(255,255,255,.13);color:#8f82b2}
+.scale i.on{background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff;border:0;box-shadow:0 0 16px rgba(176,124,255,.28)}
+.question+.question{margin-top:18px;padding-top:18px;border-top:1px solid rgba(255,255,255,.08)}
+.question b{font-size:13px}.question .muted{margin-top:4px}
+.photoStage{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:13px}
+.photo{height:210px;border-radius:18px;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.12);background:
+ radial-gradient(circle at 50% 22%,rgba(255,255,255,.17) 0 14px,transparent 15px),
+ radial-gradient(ellipse at 50% 62%,rgba(255,255,255,.11) 0 38px,transparent 39px),
+ linear-gradient(145deg,rgba(139,92,246,.17),rgba(236,72,153,.08))}
+.photo:after{content:"";position:absolute;left:50%;top:49px;transform:translateX(-50%);width:55px;height:124px;border-radius:45% 45% 35% 35%;background:rgba(255,255,255,.09);filter:blur(.2px)}
+.photoLabel{position:absolute;z-index:2;left:10px;bottom:10px;padding:5px 8px;border-radius:9px;background:rgba(5,3,16,.72);font:10px "Share Tech Mono";letter-spacing:.08em}
+.photoNav{display:flex;justify-content:space-between;align-items:center;margin-top:12px}.photoTabs{display:flex;gap:6px}
+.pill{padding:7px 10px;border-radius:99px;border:1px solid rgba(255,255,255,.11);font:10px "Share Tech Mono";color:#9d91c2}.pill.active{color:#fff;border-color:rgba(176,124,255,.5);background:rgba(176,124,255,.12)}
+.photoStats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}.photoStats div{text-align:center;padding:9px 4px;border-radius:13px;background:rgba(255,255,255,.045)}.photoStats b{display:block;font:14px "Share Tech Mono"}.photoStats span{font-size:9px;color:#8f82b2}
+.secondaryButton{margin-top:10px;text-align:center;padding:13px;border-radius:99px;border:1px solid rgba(176,124,255,.3);color:#e7ddfa;font-weight:700;font-size:12px}
+
+.oneLineBrand{
+  display:flex!important;
+  flex-direction:row!important;
+  flex-wrap:nowrap!important;
+  justify-content:center!important;
+  align-items:baseline!important;
+  gap:5px!important;
+  width:100%!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+}
+.oneLineBrand span{
+  display:inline-block!important;
+  flex:0 0 auto!important;
+  font-size:12px!important;
+  line-height:1!important;
+  letter-spacing:0!important;
+  white-space:nowrap!important;
+}
+.oneLineBrand strong{
+  display:inline-block!important;
+  flex:0 0 auto!important;
+  font-size:38px!important;
+  line-height:.88!important;
+  letter-spacing:-.055em!important;
+  white-space:nowrap!important;
+}
+.topReportCTA{
+  margin:12px 0 18px;
+  padding:15px 17px;
+  border-radius:19px;
+  background:linear-gradient(135deg,rgba(139,92,246,.20),rgba(236,72,153,.15));
+  border:1px solid rgba(213,166,255,.28);
+  box-shadow:0 0 26px rgba(139,92,246,.10);
+}
+.topReportCTA .mini{
+  font:10px "Share Tech Mono";
+  letter-spacing:.12em;
+  color:#bba6e7;
+}
+.topReportCTA .cta{
+  margin-top:9px;
+  padding:14px 15px;
+  border-radius:99px;
+  text-align:center;
+  background:linear-gradient(90deg,#8b5cf6,#ec4899);
+  color:#fff;
+  font-size:13px;
+  font-weight:800;
+}
+
+
+/* premium liquid glass */
+body{background:radial-gradient(circle at 18% 5%,rgba(147,94,255,.22),transparent 30%),radial-gradient(circle at 88% 24%,rgba(255,83,181,.14),transparent 28%),radial-gradient(circle at 48% 70%,rgba(76,105,255,.11),transparent 34%),#070510!important;position:relative;overflow-x:hidden}
+body:before,body:after{content:"";position:fixed;z-index:-1;width:310px;height:310px;border-radius:45% 55% 62% 38%/50% 42% 58% 50%;filter:blur(55px);opacity:.24;pointer-events:none;animation:liquidFloat 12s ease-in-out infinite alternate}
+body:before{left:-135px;top:16%;background:linear-gradient(145deg,#7c3aed,#ec4899)}
+body:after{right:-165px;top:58%;background:linear-gradient(145deg,#3b82f6,#a855f7);animation-duration:16s;animation-direction:alternate-reverse}
+@keyframes liquidFloat{0%{transform:translate3d(0,-18px,0) rotate(-8deg) scale(.96)}50%{transform:translate3d(24px,18px,0) rotate(8deg) scale(1.06)}100%{transform:translate3d(-8px,44px,0) rotate(-2deg) scale(1)}}
+.card,.topReportCTA,.mot,.trendBox{background:linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.025))!important;border:1px solid rgba(255,255,255,.16)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 16px 45px rgba(0,0,0,.23)!important;-webkit-backdrop-filter:blur(24px) saturate(145%);backdrop-filter:blur(24px) saturate(145%);position:relative;overflow:hidden}
+.card:before,.topReportCTA:before{content:"";position:absolute;width:170px;height:90px;left:-30px;top:-55px;border-radius:50%;background:rgba(255,255,255,.10);filter:blur(24px);pointer-events:none}
+.card,.topReportCTA{border-radius:25px!important}
+.topReportCTA .cta,.button{background:linear-gradient(110deg,rgba(138,92,246,.94),rgba(213,91,231,.92) 52%,rgba(236,72,153,.92))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 8px 24px rgba(168,85,247,.22)!important;border:1px solid rgba(255,255,255,.14)}
+.secondaryButton,.pill{background:rgba(255,255,255,.045)!important;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+.oneLineBrand{margin-top:17px!important;filter:drop-shadow(0 7px 24px rgba(166,115,255,.15))}
+.oneLineBrand strong{background:linear-gradient(180deg,#fff 18%,#ded4ff 64%,#ae8eff);-webkit-background-clip:text;background-clip:text;color:transparent!important;text-shadow:none!important}
+.oneLineBrand span{color:rgba(240,235,255,.74)!important}
+h2{letter-spacing:.13em!important;color:rgba(214,203,238,.70)!important}
+@media(prefers-reduced-motion:reduce){body:before,body:after{animation:none}}
+
+</style><style>
+.topline{display:flex!important;justify-content:space-between!important;align-items:center!important;margin:0 0 12px!important}
+.brandFixed{display:flex!important;flex-flow:row nowrap!important;justify-content:center!important;align-items:baseline!important;gap:5px!important;width:100%!important;white-space:nowrap!important;margin:14px 0!important}
+.brandFixed .sm{font:500 clamp(10px,3vw,13px) Manrope,sans-serif!important;white-space:nowrap!important;letter-spacing:0!important}
+.brandFixed .big{font:700 clamp(30px,9vw,43px) Unbounded,sans-serif!important;letter-spacing:-.06em!important;white-space:nowrap!important}
+.topReportCTA{margin-top:13px!important}
+#openReport{display:block;width:100%;cursor:pointer}
+.reportScreen{position:fixed;inset:0;z-index:9999;overflow-y:auto;background:radial-gradient(circle at 20% 0%,#281745,#090714 65%);padding:20px max(18px,calc((100vw - 520px)/2));color:#f7f3ff}
+.reportScreen[hidden],#reportResult[hidden],#cycleDateWrap[hidden]{display:none!important}
+.formTop{display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:.1em;color:#b9a9d7}
+.formTop button{background:transparent;color:white;border:0;font-size:14px;padding:12px 0}
+.reportScreen h1{font:700 24px Unbounded,sans-serif;margin:25px 0 8px}
+.reportScreen .hint{font-size:12px;color:#b7a9cb;line-height:1.6}
+.formGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0}
+.reportScreen label{display:block;color:#ded5ed;font-size:12px;line-height:1.5}
+.reportScreen input:not([type=radio]):not([type=checkbox]),.reportScreen select,.reportScreen textarea{display:block;width:100%;box-sizing:border-box;margin-top:7px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:white;padding:13px;font:15px Manrope,sans-serif;outline:none}
+.reportScreen option{color:#111}
+.reportScreen fieldset{border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:18px 13px;margin:15px 0;background:rgba(255,255,255,.045)}
+.reportScreen legend{font-size:13px;font-weight:700;padding:0 6px}
+.scaleChoices{display:flex;gap:7px;justify-content:space-between;margin-top:12px}
+.scaleChoices label{flex:1;text-align:center}
+.scaleChoices input{position:absolute;opacity:0}
+.scaleChoices span{display:block;border:1px solid rgba(255,255,255,.17);padding:12px 0;border-radius:12px;font-weight:700}
+.scaleChoices input:checked+span{background:#a56bf6;border-color:#e5c5ff;color:#fff}
+.ends{display:flex;justify-content:space-between;gap:14px;margin-top:10px;color:#afa1c8;font-size:10px}
+.ends span{max-width:47%}.ends span:last-child{text-align:right}
+.checkline{display:flex!important;gap:10px;align-items:center;margin:10px 0}
+.wideLabel{margin:20px 0}.saveReport,.subButton{width:100%;border:0;border-radius:18px;padding:16px;margin:8px 0 15px;background:linear-gradient(100deg,#8053ef,#e34ea5);color:white;font-weight:800}
+.subButton{background:rgba(255,255,255,.12)}
+#reportText{white-space:pre-wrap;font:12px/1.7 monospace;background:rgba(255,255,255,.07);padding:16px;border-radius:18px}
+</style></head>
+<body><main>
+<div class="brand brandFixed"><span class="sm">держи</span><span class="big">FOCUS</span><span class="sm">на себе</span></div><section class="card quoteCard">
+<div class="quoteLabel">FOCUS // СЕГОДНЯ</div>
+<div class="quoteText" id="topQuote">Не нужен идеальный день. Нужна ещё одна неделя, которую ты не бросила.</div>
+<div class="quoteDots"><i class="on"></i><i></i><i></i><i></i></div>
+</section><section class="topReportCTA">
+<div class="mini">НЕДЕЛЯ 6 / 16</div>
+<button class="cta" id="openReport" type="button">СДАТЬ НЕДЕЛЬНЫЙ ОТЧЁТ</button>
+</section>
+<h2>ДИНАМИКА</h2>
+<div class="toggle">
+<button class="active" id="weightBtn" onclick="showMetric('weight')" type="button">ВЕС</button>
+<button id="fatBtn" onclick="showMetric('fat')" type="button">% ЖИРА</button>
+</div>
+<div id="weightPanel">
+<div class="topline">
+<div class="tag">BIO-SCAN</div>
+<div class="signature">by Valeria Trushina</div>
+</div>
+
+
+<section class="card">
+<div class="goalheads"><div><div class="cap">СТАРТ</div><div class="kg">65 кг</div></div><div class="right"><div class="cap">ЦЕЛЬ</div><div class="kg">60 кг</div></div></div>
+<div class="track"><div class="base"></div><div class="fill"></div>
+<i class="old" style="left:9%"></i><i class="old" style="left:17%"></i><i class="old" style="left:25%"></i><i class="old" style="left:31%"></i>
+<div class="lab">63,2 кг</div><i class="now"></i><i class="goal"></i>
+</div>
+<div class="meta"><span>−1,8 кг</span><b>36% пути</b><span>осталось 3,2 кг</span></div>
+<div class="mot"><b>🔥 Уже больше трети пути</b><span>Большая точка — твой вес сейчас. Маленькие точки показывают, где ты была раньше.</span></div>
+<div class="trendBox">
+<div class="trendHead"><b>ТРЕНД ВЕСА · 4 НЕДЕЛИ</b><span class="trendValue">↓ −1,1 кг</span></div>
+<p>Даже если отдельная неделя даст небольшой плюс, FOCUS оценивает общую траекторию, а не один скачок веса.</p>
+</div>
+</section></div>
+<div id="fatPanel"><section class="card">
+<div class="goalheads">
+<div><div class="cap">СТАРТ</div><div class="kg">27,4%</div></div>
+<div class="right"><div class="cap">ЛУЧШИЙ РЕЗУЛЬТАТ</div><div class="kg">24,8%</div></div>
+</div>
+<div class="track">
+<div class="base"></div>
+<div class="fill" style="width:88%"></div>
+<i class="old" style="left:18%"></i>
+<i class="old" style="left:35%"></i>
+<i class="old" style="left:54%"></i>
+<i class="old" style="left:70%"></i>
+<div class="lab" style="left:88%">25,1%</div>
+<i class="now" style="left:88%"></i>
+<i class="goal" style="left:100%"></i>
+</div>
+<div class="meta"><span>−2,3 п.п.</span><b>текущий 25,1%</b><span>лучший 24,8%</span></div>
+<div class="mot"><b>⭐ Почти лучший результат</b><span>Прошлые значения остаются маленькими точками — так же, как в динамике веса.</span></div>
+</section></div>
+<script>
+function showMetric(metric){
+  var w=document.getElementById('weightPanel');
+  var f=document.getElementById('fatPanel');
+  var wb=document.getElementById('weightBtn');
+  var fb=document.getElementById('fatBtn');
+  if(metric==='fat'){
+    w.style.display='none'; f.style.display='block';
+    wb.className=''; fb.className='active';
+  }else{
+    w.style.display='block'; f.style.display='none';
+    wb.className='active'; fb.className='';
+  }
+}
+</script>
+<h2>ЭТА НЕДЕЛЯ</h2>
+<section class="card">
+<div class="win">
+<div class="mini"><div class="muted">ВЕС</div><div class="v">63,2</div><div class="up">↓ 0,4 кг</div></div>
+<div class="mini"><div class="muted">ТАЛИЯ</div><div class="v">71,0</div><div class="up">↓ 1 см</div></div>
+<div class="mini"><div class="muted">ШАГИ</div><div class="v">8 800</div><div class="up">↑ +1 400</div></div>
+<div class="mini"><div class="muted">ЖИР · US NAVY</div><div class="v">24,8%</div><div class="up">↓ 0,5 п.п.</div></div>
+</div>
+<div class="mot"><b>Отличная динамика активности 💪</b><span>В среднем на 1 400 шагов в день больше, чем на прошлой неделе.</span></div>
+</section>
+<h2>ДО / СЕЙЧАС</h2>
+<section class="card">
+<div class="reporttitle"><b>Визуальный прогресс</b><span class="muted">START → последнее фото</span></div>
+<div class="photoStage">
+<div class="photo"><span class="photoLabel">START · 03.11</span></div>
+<div class="photo"><span class="photoLabel">НЕДЕЛЯ 8 · 29.12</span></div>
+</div>
+<div class="photoNav">
+<div class="photoTabs"><span class="pill active">ФРОНТ</span><span class="pill">БОК</span><span class="pill">СПИНА</span></div>
+<span class="muted">1 ↔ 4</span>
+</div>
+<div class="photoStats">
+<div><b>−4,2 кг</b><span>ВЕС</span></div>
+<div><b>−6 см</b><span>ТАЛИЯ</span></div>
+<div><b>−3,1 п.п.</b><span>% ЖИРА</span></div>
+</div>
+<div class="button">ОТКРЫТЬ ДО / СЕЙЧАС</div>
+<div class="secondaryButton">ВЫБРАТЬ ДВЕ ДАТЫ</div>
+<div class="muted" style="margin-top:11px">Первое загруженное фото всегда остаётся START. Новые фото автоматически сравниваются с ним.</div>
+</section>
+<h2>ПРОГРАММА</h2>
+<section class="card"><div class="weektop"><div><div class="big">6/16</div><div class="muted">недель с отчётами</div></div><div class="right"><div class="muted">сейчас</div><div class="week">7 неделя</div></div></div>
+<div class="dots"><i class="dot on"></i><i class="dot on"></i><i class="dot on"></i><i class="dot on"></i><i class="dot on"></i><i class="dot on"></i><i class="dot cur"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></div></section>
+<h2>ПОСЛЕДНИЙ ОТЧЁТ</h2>
+<section class="card">
+<div class="reporttitle"><b>Неделя 6</b><span class="muted">19.10–25.10</span></div>
+<div class="row"><span>Средний вес</span><b>63,2 кг</b></div>
+<div class="row"><span>Минимальный вес</span><b>62,9 кг</b></div>
+<div class="row"><span>Средние ккал</span><b>1 650</b></div>
+<div class="row"><span>Шаги</span><b>8 800</b></div>
+<div class="row"><span>Тренировки</span><b>4</b></div>
+<div class="row"><span>Точность ведения FitSecret</span><b>4/5</b></div>
+<div class="row"><span>Легко соблюдать план</span><b>3/5</b></div>
+
+</section>
+<h2>МОТИВАЦИЯ</h2>
+<section class="card">
+<div class="mot" style="margin-top:0">
+<b id="motTitle">🏆 Исторический минимум — 62,9 кг</b>
+<span id="motText">Ты обновила свой лучший результат. До цели осталось 3,2 кг.</span>
+</div>
+<div class="muted" style="margin-top:12px">Фраза будет подбираться по реальным результатам недели.</div>
+</section>
+<script>
+(function(){
+ var phrases=[
+  ["🏆 Исторический минимум — 62,9 кг","Ты обновила свой лучший результат. До цели осталось 3,2 кг."],
+  ["🔥 Ещё одна неделя в сторону цели","Не идеальность, а повторяемость действий двигает линию прогресса."],
+  ["📐 Изменения видны не только на весах","Следи за талией, активностью и общей траекторией — они дополняют картину."],
+  ["🚀 Ты продолжаешь собирать прогресс","Каждая заполненная неделя делает твою динамику понятнее и полезнее."]
+ ];
+ var i=(new Date()).getDate()%phrases.length;
+ var t=document.getElementById("motTitle"), x=document.getElementById("motText");
+ if(t&&x){t.textContent=phrases[i][0];x.textContent=phrases[i][1];}
+})();
+</script>
+</main>
+<script>
+(function(){
+ var quotes=[
+  "Не нужен идеальный день. Нужна ещё одна неделя, которую ты не бросила.",
+  "Смотри на траекторию, а не на один показатель.",
+  "Твоя задача сегодня — не ускориться, а продолжить.",
+  "Прогресс становится заметным после того, как привычки становятся обычными.",
+  "Маленькие изменения, которые повторяются, меняют большую картину.",
+  "Ты соревнуешься не с чужим результатом, а со своей прошлой точкой."
+ ];
+ var el=document.getElementById("topQuote");
+ if(el){el.textContent=quotes[(new Date()).getDate()%quotes.length];}
+})();
+</script>
+
+<div class="reportScreen" hidden="" id="reportScreen">
+<div class="formTop"><button id="closeReport" type="button">← Назад</button><span>FOCUS / НЕДЕЛЬНЫЙ ОТЧЁТ</span></div>
+<h1>Сдать недельный отчёт</h1>
+<p class="hint">Поля необязательные. Заполни то, что отслеживала на этой неделе.</p>
+<form id="weeklyForm">
+<div class="formGrid">
+<label>Номер недели<input max="16" min="1" name="week" type="number" value="7"/></label>
+<label>Средние ккал<input min="0" name="kcal" placeholder="1650" step="1" type="number"/></label>
+<label>Средний вес, кг<input min="0" name="avg" placeholder="63.2" step=".01" type="number"/></label>
+<label>Минимальный вес, кг<input min="0" name="min" placeholder="62.9" step=".01" type="number"/></label>
+<label>Талия, см<input min="0" name="waist" step=".1" type="number"/></label>
+<label>Бёдра, см<input min="0" name="hips" step=".1" type="number"/></label>
+<label>Шея, см<input min="0" name="neck" step=".1" type="number"/></label>
+<label>Средние шаги<input min="0" name="steps" type="number"/></label>
+<label>Тренировок<input min="0" name="work" type="number"/></label>
+<label>Уровень голода<select name="hunger"><option value="">Выбери</option><option>Не было</option><option>Низкий</option><option>Средний</option><option>Сильный</option></select></label>
+<label>Самочувствие<select name="feel"><option value="">Выбери</option><option>Хорошее</option><option>Среднее</option><option>Плохое</option></select></label>
+</div>
+<fieldset><legend>Насколько точно ты вела FatSecret на этой неделе?</legend>
+<div class="scaleChoices" data-name="fatsecret"></div><div class="ends"><span>1 — почти не записывала</span><span>5 — записывала практически всё</span></div></fieldset>
+<fieldset><legend>Насколько легко тебе было соблюдать план?</legend>
+<div class="scaleChoices" data-name="ease"></div><div class="ends"><span>1 — очень тяжело</span><span>5 — очень легко</span></div></fieldset>
+<fieldset><legend>Начались ли месячные с прошлого отчёта?</legend><label class="checkline"><input id="cycleYes" name="cycle" type="checkbox"/> Да</label><label hidden="" id="cycleDateWrap">Первый день<input name="cycleDate" type="date"/></label></fieldset>
+<label class="wideLabel">Комментарий к неделе<textarea name="comment" placeholder="Если хочешь, добавь подробности" rows="3"></textarea></label>
+<button class="saveReport" type="submit">СОХРАНИТЬ ОТЧЁТ</button>
+</form>
+<div hidden="" id="reportResult"><h2>Отчёт сохранён на этом устройстве</h2><p class="hint">Пока это локальная тестовая версия. Google Sheets ещё не подключены.</p><pre id="reportText"></pre><button class="saveReport" id="copyReport" type="button">СКОПИРОВАТЬ ОТЧЁТ</button><button class="subButton" id="newReport" type="button">Вернуться к форме</button></div>
+</div>
+<script>
+(function(){
+var screen=document.getElementById('reportScreen'), form=document.getElementById('weeklyForm'), result=document.getElementById('reportResult');
+document.getElementById('openReport').onclick=function(){screen.hidden=false;document.body.style.overflow='hidden';};
+document.getElementById('closeReport').onclick=function(){screen.hidden=true;document.body.style.overflow='';};
+document.getElementById('cycleYes').onchange=function(){document.getElementById('cycleDateWrap').hidden=!this.checked;};
+document.querySelectorAll('.scaleChoices').forEach(function(group){
+ var name=group.dataset.name;
+ for(var i=1;i<=5;i++){var label=document.createElement('label');label.innerHTML='<input type="radio" name="'+name+'" value="'+i+'"><span>'+i+'</span>';group.appendChild(label);}
+});
+function fmt(v){return String(v).replace('.',',');}
+form.onsubmit=function(e){
+ e.preventDefault();var f=new FormData(form),d={};f.forEach(function(v,k){if(v!=='')d[k]=v;});
+ try{localStorage.setItem('focus_week_'+(d.week||'7'),JSON.stringify(d));}catch(err){}
+ var names=[['kcal','Средние ккал за неделю'],['avg','Средний вес за неделю',' кг'],['min','Минимальный вес за неделю',' кг'],['neck','ОШ',' см'],['waist','ОТ',' см'],['hips','ОБ',' см'],['steps','Среднее кол-во шагов'],['hunger','Уровень голода'],['feel','Самочувствие'],['fatsecret','Точность ведения FatSecret','/5'],['ease','Лёгкость соблюдения плана','/5'],['work','Кол-во тренировок']];
+ var lines=['НЕДЕЛЬНЫЙ ОТЧЁТ · '+(d.week||'?')+'/16 НЕДЕЛЯ',''];
+ names.forEach(function(row){if(d[row[0]]!==undefined)lines.push(row[1]+': '+fmt(d[row[0]])+(row[2]||''));});
+ if(d.cycle)lines.push('Месячные с прошлого отчёта: да'+(d.cycleDate?' — '+d.cycleDate:''));
+ if(d.comment)lines.push('','Комментарий: '+d.comment);
+ document.getElementById('reportText').textContent=lines.join('\\n');
+ form.hidden=true;result.hidden=false;screen.scrollTop=0;
+};
+document.getElementById('copyReport').onclick=function(){
+ var txt=document.getElementById('reportText').textContent;
+ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){document.getElementById('copyReport').textContent='СКОПИРОВАНО ✓';}).catch(function(){window.prompt('Скопируй текст:',txt);});}
+ else window.prompt('Скопируй текст:',txt);
+};
+document.getElementById('newReport').onclick=function(){form.hidden=false;result.hidden=true;};
+})();
+</script></body></html>
