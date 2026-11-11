@@ -198,7 +198,7 @@ function showMetric(metric){
 <div class="mini"><div class="muted">СРЕДНИЙ ВЕС</div><div class="v" id="dashboardAvg">—</div><div class="up" id="dashboardAvgChange">—</div></div>
 <div class="mini"><div class="muted">ТАЛИЯ</div><div class="v" id="dashboardWaist">—</div><div class="up" id="dashboardWaistChange">—</div></div>
 <div class="mini"><div class="muted">ШАГИ</div><div class="v" id="dashboardSteps">—</div><div class="up" id="dashboardStepsChange">—</div></div>
-<div class="mini"><div class="muted">FATSECRET</div><div class="v" id="dashboardFatsecret">—</div><div class="up">оценка из отчёта</div></div>
+<div class="mini"><div class="muted">СРЕДНИЕ ККАЛ</div><div class="v" id="dashboardKcal">—</div><div class="up">ккал в день</div></div>
 </div>
 <div class="mot"><b id="dashboardReportTitle">Пока нет сохранённых отчётов</b><span id="dashboardReportHint">После сохранения недельный отчёт отобразится здесь.</span></div>
 </section>
@@ -320,12 +320,12 @@ function renderDashboard(){
  document.getElementById('programCount').textContent=Math.min(n,16)+'/16';
  document.getElementById('programCurrentWeek').textContent=n>=16?'16 недель завершено':(n+1)+' неделя';
  var dots=document.getElementById('programDots');dots.innerHTML='';for(var i=1;i<=16;i++){var dot=document.createElement('i');dot.className='dot'+(i<=n?' on':i===n+1?' cur':'');dots.appendChild(dot);}
- var avg=displayValue(data.avg,' кг'),min=displayValue(data.min,' кг'),waist=displayValue(data.waist,' см'),steps=displayValue(data.steps,''),fatsecret=data.fatsecret&&data.fatsecret!=='—'?data.fatsecret+'/5':'—';
+ var avg=displayValue(data.avg,' кг'),min=displayValue(data.min,' кг'),waist=displayValue(data.waist,' см'),steps=displayValue(data.steps,''),kcal=displayValue(data.kcal,'');
  document.getElementById('dashboardWeight').textContent=avg;document.getElementById('dashboardMinWeight').textContent=min;document.getElementById('dashboardWeightChange').textContent=reportDelta(data.avg,before.avg,' кг',1);
  document.getElementById('dashboardAvg').textContent=avg;document.getElementById('dashboardAvgChange').textContent=reportDelta(data.avg,before.avg,' кг',1);
  document.getElementById('dashboardWaist').textContent=waist;document.getElementById('dashboardWaistChange').textContent=reportDelta(data.waist,before.waist,' см',1);
  document.getElementById('dashboardSteps').textContent=steps==='—'?'—':Number(steps.replace(/\s/g,'')).toLocaleString('ru-RU');document.getElementById('dashboardStepsChange').textContent=reportDelta(data.steps,before.steps,' шагов',0);
- document.getElementById('dashboardFatsecret').textContent=fatsecret;document.getElementById('dashboardFat').textContent='—';
+ document.getElementById('dashboardKcal').textContent=kcal;
  document.getElementById('dashboardReportTitle').textContent=latest?'Сохранён отчёт · неделя '+latest.week+'/16':'Пока нет сохранённых отчётов';
  document.getElementById('dashboardReportHint').textContent=latest?'Показаны ответы из последнего отчёта на этом устройстве.':'После сохранения недельный отчёт отобразится здесь.';
  document.getElementById('dashboardReportDate').textContent=latest?'Последний отчёт · '+new Date(latest.date).toLocaleDateString('ru-RU'):'Ответы появятся после сохранения отчёта.';
