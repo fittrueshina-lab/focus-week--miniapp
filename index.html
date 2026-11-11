@@ -294,7 +294,7 @@ var steps=Array.from(document.querySelectorAll('.wizardStep'));var idx=0;
 function showStep(n){idx=Math.max(0,Math.min(n,steps.length-1));steps.forEach(function(el,i){el.classList.toggle('active',i===idx)});document.getElementById('wizardProgress').textContent='Шаг '+(idx+1)+' из '+steps.length;document.getElementById('wizardFill').style.width=((idx+1)/steps.length*100)+'%';document.getElementById('prevStep').hidden=idx===0;document.getElementById('nextStep').hidden=idx===steps.length-1;document.getElementById('submitReport').hidden=idx!==steps.length-1;screen.scrollTop=0;}
 function open(el){el.hidden=false;document.body.style.overflow='hidden';el.scrollTop=0;}
 function close(el){el.hidden=true;document.body.style.overflow='';}
-document.getElementById('openReport').onclick=function(){if(count()>=16){alert('Все 16 отчётов сохранены. Открой историю отчётов.');return;}form.reset();form.hidden=false;result.hidden=true;open(screen);showStep(0)};
+document.getElementById('openReport').onclick=function(){if(count()>=16&&!hasOpenPeriod()){alert('Все 16 отчётов сохранены. Открой историю отчётов.');return;}form.reset();form.hidden=false;result.hidden=true;open(screen);showStep(0)};
 var historyButton=document.createElement('button');historyButton.type='button';historyButton.className='subButton';historyButton.textContent='ИСТОРИЯ ОТЧЁТОВ';historyButton.style.cssText='display:block;width:100%;margin:10px 0 20px';var reportButton=document.getElementById('openReport');reportButton.insertAdjacentElement('afterend',historyButton);
 document.getElementById('closeReport').onclick=function(){close(screen)};
 var zoom=document.getElementById('measureZoom');document.getElementById('zoomMeasurements').onclick=function(){zoom.hidden=false;};document.getElementById('closeMeasureZoom').onclick=function(){zoom.hidden=true;};
@@ -310,12 +310,15 @@ form.querySelectorAll('input[name="neck"],input[name="waist"],input[name="hips"]
 form.querySelectorAll('input[name="kcal"],input[name="avg"],input[name="min"],input[name="neck"],input[name="waist"],input[name="hips"],input[name="steps"],input[name="work"]').forEach(function(el){var b=document.createElement('button');b.type='button';b.className='missingBtn';b.textContent='Нет данных —';b.onclick=function(){el.value='—';el.blur();};el.parentNode.appendChild(b);});
 function clean(v){return String(v||'—').trim().replace(/\\n/g,' ').replace(/\\r/g,' ');}
 function unit(v,u){v=clean(v);return v==='—'?v:v.replace('.',',')+u;}
-function count(){try{return JSON.parse(localStorage.getItem('focus_reports_v16')||'[]').length}catch(e){return 0}}
+var REPORT_PERIOD_MS=3*24*60*60*1000;
+function count(){var all=getReports();return new Set(all.map(function(r){return r.week})).size;}
+function hasOpenPeriod(){var all=getReports();for(var i=all.length-1;i>=0;i--){if(all[i].counted){return Date.now()-new Date(all[i].date).getTime()<REPORT_PERIOD_MS;}}return false;}
+function weekForCurrentReport(){var all=getReports();for(var i=all.length-1;i>=0;i--){if(all[i].counted){return Date.now()-new Date(all[i].date).getTime()<REPORT_PERIOD_MS?all[i].week:count()+1;}}return 1;}
 function numberValue(value){var n=parseFloat(String(value||'').replace(/\s/g,'').replace(',','.'));return Number.isFinite(n)?n:null;}
 function displayValue(value,unit){var raw=String(value||'—').trim();if(!raw||raw==='—')return '—';return raw.replace('.',',')+(unit||'');}
 function reportDelta(current,previous,unit,precision){var a=numberValue(current),b=numberValue(previous);if(a===null||b===null)return '—';var delta=a-b;if(Math.abs(delta)<0.0001)delta=0;var sign=delta>0?'+':delta<0?'−':'';return sign+Math.abs(delta).toFixed(precision).replace('.',',')+(unit||'');}
 function renderDashboard(){
- var all=getReports(),n=all.length,latest=all[n-1],previous=all[n-2],data=latest&&latest.data||{},before=previous&&previous.data||{};
+ var all=getReports(),n=count(),latest=all[all.length-1],previous=null;for(var p=all.length-2;p>=0;p--){if(latest&&all[p].week!==latest.week){previous=all[p];break;}}var data=latest&&latest.data||{},before=previous&&previous.data||{};
  document.getElementById('programCount').textContent=Math.min(n,16)+'/16';
  document.getElementById('programCurrentWeek').textContent=n>=16?'16 недель завершено':(n+1)+' неделя';
  var dots=document.getElementById('programDots');dots.innerHTML='';for(var i=1;i<=16;i++){var dot=document.createElement('i');dot.className='dot'+(i<=n?' on':i===n+1?' cur':'');dots.appendChild(dot);}
@@ -330,7 +333,7 @@ function renderDashboard(){
  document.getElementById('dashboardReportDate').textContent=latest?'Последний отчёт · '+new Date(latest.date).toLocaleDateString('ru-RU'):'Ответы появятся после сохранения отчёта.';
 }
 function updateCount(){var n=count();document.querySelector('.topReportCTA .mini').textContent='СЛЕДУЮЩИЙ ОТЧЁТ · НЕДЕЛЯ '+Math.min(n+1,16)+' / 16';renderDashboard();}
-form.onsubmit=function(e){e.preventDefault();if(!validStep())return;var f=new FormData(form),d={};f.forEach(function(v,k){d[k]=v});['fatsecret','ease'].forEach(function(k){if(!d[k])d[k]='—'});var week=count()+1;if(week>16){alert('16 отчётов уже сохранено.');return;}
+form.onsubmit=function(e){e.preventDefault();if(!validStep())return;var f=new FormData(form),d={};f.forEach(function(v,k){d[k]=v});['fatsecret','ease'].forEach(function(k){if(!d[k])d[k]='—'});var week=weekForCurrentReport();if(week>16){alert('16 отчётов уже сохранено.');return;}
 var lines=['НЕДЕЛЬНЫЙ ОТЧЁТ · '+week+'/16 НЕДЕЛЯ','',
 '1. Средние ккал за неделю: '+clean(d.kcal),
 '2. Средний вес за неделю: '+unit(d.avg,' кг'),
@@ -349,7 +352,14 @@ try{var reports=JSON.parse(localStorage.getItem('focus_reports_v16')||'[]');repo
 updateCount();form.hidden=true;result.hidden=false;screen.scrollTop=0;};
 document.getElementById('copyReport').onclick=function(){var txt=document.getElementById('reportText').textContent,btn=this;function success(){btn.textContent='СКОПИРОВАНО ✓'}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(success).catch(function(){fallback()});}else fallback();function fallback(){var t=document.createElement('textarea');t.value=txt;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();var ok=false;try{ok=document.execCommand('copy')}catch(e){}t.remove();if(ok)success();else window.prompt('Скопируй отчёт:',txt);}};
 var historyScreen=document.getElementById('historyScreen'),historyDetail=document.getElementById('historyDetail'),historyList=document.getElementById('historyList'),chosenHistory=-1;
-function getReports(){try{return JSON.parse(localStorage.getItem('focus_reports_v16')||'[]')}catch(e){return []}}
+function getReports(){
+ var reports;try{reports=JSON.parse(localStorage.getItem('focus_reports_v16')||'[]')}catch(e){return []}
+ if(!Array.isArray(reports))return [];
+ reports=reports.map(function(r,i){var copy=Object.assign({},r);copy._originalOrder=i;return copy;}).sort(function(a,b){return new Date(a.date).getTime()-new Date(b.date).getTime()||a._originalOrder-b._originalOrder;});
+ var counted=0,lastCountedAt=null;
+ reports.forEach(function(r){var timestamp=new Date(r.date).getTime();if(!Number.isFinite(timestamp))timestamp=lastCountedAt===null?Date.now():lastCountedAt+REPORT_PERIOD_MS;r.counted=lastCountedAt===null||timestamp-lastCountedAt>=REPORT_PERIOD_MS;if(r.counted){counted++;lastCountedAt=timestamp;}r.week=counted;if(r.text)r.text=r.text.replace(/^НЕДЕЛЬНЫЙ ОТЧЁТ · \d+\/16 НЕДЕЛЯ/, 'НЕДЕЛЬНЫЙ ОТЧЁТ · '+r.week+'/16 НЕДЕЛЯ');delete r._originalOrder;});
+ return reports;
+}
 function setReports(items){localStorage.setItem('focus_reports_v16',JSON.stringify(items));}
 function copyText(txt,btn){function success(){btn.textContent='СКОПИРОВАНО ✓'}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(success).catch(fallback)}else fallback();function fallback(){var t=document.createElement('textarea');t.value=txt;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();var ok=false;try{ok=document.execCommand('copy')}catch(e){}t.remove();if(ok)success();else window.prompt('Скопируй отчёт:',txt)}}
 function sendText(txt){
