@@ -321,19 +321,21 @@ function drawTrend(id,series,color){
  if(coords.length>1){var area=document.createElementNS('http://www.w3.org/2000/svg','path');area.setAttribute('d','M '+coords[0][0]+' 45 L '+coords.map(function(p){return p[0]+' '+p[1]}).join(' L ')+' L '+coords[coords.length-1][0]+' 45 Z');area.setAttribute('fill',color);area.setAttribute('fill-opacity','.13');svg.appendChild(area);var line=document.createElementNS('http://www.w3.org/2000/svg','polyline');line.setAttribute('points',coords.map(function(p){return p.join(',')}).join(' '));line.setAttribute('fill','none');line.setAttribute('stroke',color);line.setAttribute('stroke-width','2.5');line.setAttribute('stroke-linecap','round');line.setAttribute('stroke-linejoin','round');svg.appendChild(line);}
  var last=document.createElementNS('http://www.w3.org/2000/svg','circle');last.setAttribute('cx',coords[coords.length-1][0]);last.setAttribute('cy',coords[coords.length-1][1]);last.setAttribute('r','3.5');last.setAttribute('fill',color);last.setAttribute('stroke','#fff');last.setAttribute('stroke-width','1.5');svg.appendChild(last);
 }
-function renderMetricTrend(reports,key,valueId,deltaId,graphId,noteId,unit,precision,color,format){
- var series=metricSeries(reports,key),latest=series[series.length-1],previous=series[series.length-2],value=document.getElementById(valueId),delta=document.getElementById(deltaId),note=document.getElementById(noteId);
+function renderMetricTrend(reports,latestReport,key,valueId,deltaId,graphId,noteId,unit,precision,color,format){
+ var series=metricSeries(reports,key),latest=series[series.length-1],previous=series[series.length-2],value=document.getElementById(valueId),delta=document.getElementById(deltaId),note=document.getElementById(noteId),hasLatestValue=numberValue(latestReport&&latestReport.data&&latestReport.data[key])!==null;
  value.textContent=latest?format(latest.value):'—';delta.textContent=latest&&previous?reportDelta(latest.value,previous.value,unit,precision)+' к предыдущему':'—';
- drawTrend(graphId,series,color);note.textContent=series.length<2?(series.length?'Нужно ещё одно значение':'Нет данных'):'по сохранённым отчётам';
+ drawTrend(graphId,series,color);
+ if(!hasLatestValue&&latest)note.textContent='Нет данных в последнем отчёте · показана последняя тенденция';
+ else note.textContent=series.length<2?(series.length?'Нужно ещё одно значение':'Нет данных'):'по сохранённым отчётам';
 }
 function renderDashboard(){
  var all=getReports(),n=count(),latest=all[all.length-1];
  document.getElementById('programCount').textContent=Math.min(n,16)+'/16';
  document.getElementById('programCurrentWeek').textContent=n>=16?'16 недель завершено':(n+1)+' неделя';
  var dots=document.getElementById('programDots');dots.innerHTML='';for(var i=1;i<=16;i++){var dot=document.createElement('i');dot.className='dot'+(i<=n?' on':i===n+1?' cur':'');dots.appendChild(dot);}
- renderMetricTrend(all,'avg','trendAvgValue','trendAvgDelta','trendAvgGraph','trendAvgNote',' кг',1,'#b68cff',function(v){return v.toFixed(1).replace('.',',')+' кг';});
- renderMetricTrend(all,'waist','trendWaistValue','trendWaistDelta','trendWaistGraph','trendWaistNote',' см',1,'#f06bc5',function(v){return v.toFixed(1).replace('.',',')+' см';});
- renderMetricTrend(all,'steps','trendStepsValue','trendStepsDelta','trendStepsGraph','trendStepsNote',' шагов',0,'#55dcb8',function(v){return Math.round(v).toLocaleString('ru-RU');});
+ renderMetricTrend(all,latest,'avg','trendAvgValue','trendAvgDelta','trendAvgGraph','trendAvgNote',' кг',1,'#b68cff',function(v){return v.toFixed(1).replace('.',',')+' кг';});
+ renderMetricTrend(all,latest,'waist','trendWaistValue','trendWaistDelta','trendWaistGraph','trendWaistNote',' см',1,'#f06bc5',function(v){return v.toFixed(1).replace('.',',')+' см';});
+ renderMetricTrend(all,latest,'steps','trendStepsValue','trendStepsDelta','trendStepsGraph','trendStepsNote',' шагов',0,'#55dcb8',function(v){return Math.round(v).toLocaleString('ru-RU');});
  document.getElementById('dashboardReportTitle').textContent=latest?'Сохранён отчёт · неделя '+latest.week+'/16':'Пока нет сохранённых отчётов';
  document.getElementById('dashboardReportDate').textContent=latest?'Последний отчёт · '+new Date(latest.date).toLocaleDateString('ru-RU'):'После сохранения здесь появится последняя точка.';
 }
