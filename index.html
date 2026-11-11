@@ -157,7 +157,19 @@ h2{letter-spacing:.13em!important;color:rgba(214,203,238,.70)!important}
 .wideLabel{margin:20px 0}.saveReport,.subButton{width:100%;border:0;border-radius:18px;padding:16px;margin:8px 0 15px;background:linear-gradient(100deg,#8053ef,#e34ea5);color:white;font-weight:800}
 .subButton{background:rgba(255,255,255,.12)}
 #reportText{white-space:pre-wrap;font:12px/1.7 monospace;background:rgba(255,255,255,.07);padding:16px;border-radius:18px}
-.measureGuide{margin:18px 0 20px;border:1px solid rgba(238,132,220,.48);border-radius:18px;background:rgba(182,78,204,.09);overflow:hidden}.measureGuide summary{cursor:pointer;list-style:none;padding:16px;font-size:14px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px}.measureGuide summary::-webkit-details-marker{display:none}.measureGuide[open] .guideArrow{transform:rotate(180deg)}.measureGuideBody{padding:0 12px 12px}.measureGuideBody img{display:block;width:100%;height:auto;border-radius:12px}.measureGuideBody .subButton{margin:12px 0 0}.measureZoom{position:fixed;inset:0;z-index:20000;background:rgba(4,2,13,.96);overflow:auto;padding:55px 8px 20px}.measureZoom[hidden]{display:none!important}.measureZoom img{display:block;width:100%;max-width:900px;margin:auto}.measureZoom button{position:fixed;top:10px;right:12px;border:1px solid #b07cff;border-radius:20px;background:#28123d;color:white;padding:12px 20px;font-weight:700;z-index:1}</style></head>
+.measureGuide{margin:18px 0 20px;border:1px solid rgba(238,132,220,.48);border-radius:18px;background:rgba(182,78,204,.09);overflow:hidden}.measureGuide summary{cursor:pointer;list-style:none;padding:16px;font-size:14px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px}.measureGuide summary::-webkit-details-marker{display:none}.measureGuide[open] .guideArrow{transform:rotate(180deg)}.measureGuideBody{padding:0 12px 12px}.measureGuideBody img{display:block;width:100%;height:auto;border-radius:12px}.measureGuideBody .subButton{margin:12px 0 0}.measureZoom{position:fixed;inset:0;z-index:20000;background:rgba(4,2,13,.96);overflow:auto;padding:55px 8px 20px}.measureZoom[hidden]{display:none!important}.measureZoom img{display:block;width:100%;max-width:900px;margin:auto}.measureZoom button{position:fixed;top:10px;right:12px;border:1px solid #b07cff;border-radius:20px;background:#28123d;color:white;padding:12px 20px;font-weight:700;z-index:1}
+.trendBoard{padding:7px 18px!important}
+.trendRow{display:grid;grid-template-columns:minmax(0,1fr) minmax(105px,.95fr);gap:12px;align-items:center;padding:17px 0}
+.trendRow+.trendRow{border-top:1px solid rgba(255,255,255,.09)}
+.trendLabel{font-size:10px;letter-spacing:.12em;color:#b8a7d5;font-weight:800}
+.trendValue{font:26px/1.15 "Share Tech Mono",monospace;color:#fff;margin-top:5px;white-space:nowrap}
+.trendDelta{font:11px "Share Tech Mono",monospace;color:#b89cff;margin-top:5px;min-height:16px}
+.trendGraph{display:block;width:100%;height:48px;overflow:visible}
+.trendNote{font-size:9px;color:#9385ac;text-align:right;min-height:13px;margin-top:1px}
+.trendStamp{display:grid;gap:4px;padding:13px 14px;margin:5px 0 10px;border-radius:16px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09)}
+.trendStamp b{font-size:12px;color:#fff}.trendStamp span{font-size:11px;color:#a99abb}
+@media(max-width:370px){.trendRow{grid-template-columns:minmax(0,1fr) minmax(95px,.9fr);gap:8px}.trendValue{font-size:23px}.trendBoard{padding:5px 14px!important}}
+</style></head>
 <body><main>
 <div class="brand brandFixed"><span class="sm">держи</span><span class="big">FOCUS</span><span class="sm">на себе</span></div><section class="card quoteCard">
 <div class="quoteLabel">FOCUS // СЕГОДНЯ</div>
@@ -167,39 +179,21 @@ h2{letter-spacing:.13em!important;color:rgba(214,203,238,.70)!important}
 <div class="mini">СЛЕДУЮЩИЙ ОТЧЁТ</div>
 <button class="cta" id="openReport" type="button">СДАТЬ НЕДЕЛЬНЫЙ ОТЧЁТ</button>
 </section>
-<h2>ДИНАМИКА</h2>
-<div class="toggle">
-<button class="active" id="weightBtn" onclick="showMetric('weight')" type="button">ВЕС</button>
-<button id="fatBtn" onclick="showMetric('fat')" type="button">% ЖИРА</button>
+<h2>ТЕНДЕНЦИЯ ПО ОТЧЁТАМ</h2>
+<section class="card trendBoard">
+<div class="trendRow" data-metric="avg">
+<div><div class="trendLabel">СРЕДНИЙ ВЕС</div><div class="trendValue" id="trendAvgValue">—</div><div class="trendDelta" id="trendAvgDelta">—</div></div>
+<div class="trendGraphBox"><svg class="trendGraph" id="trendAvgGraph" viewBox="0 0 150 48" aria-label="Тенденция среднего веса"></svg><div class="trendNote" id="trendAvgNote"></div></div>
 </div>
-<div id="weightPanel"><section class="card">
-<div class="goalheads"><div><div class="cap">СРЕДНИЙ ВЕС ПОСЛЕДНЕГО ОТЧЁТА</div><div class="kg" id="dashboardWeight">—</div></div><div class="right"><div class="cap">МИНИМАЛЬНЫЙ ВЕС</div><div class="kg" id="dashboardMinWeight">—</div></div></div>
-<div class="trendBox"><div class="trendHead"><b>ИЗМЕНЕНИЕ К ПРЕДЫДУЩЕМУ ОТЧЁТУ</b><span class="trendValue" id="dashboardWeightChange">—</span></div><p id="dashboardReportDate">Ответы появятся после сохранения отчёта.</p></div>
-</section></div>
-<div id="fatPanel"><section class="card"><div class="cap">% ЖИРА</div><div class="kg" id="dashboardFat">—</div><p class="muted">В недельной форме пока нет поля для процента жира.</p></section></div>
-<script>
-function showMetric(metric){
-  var w=document.getElementById('weightPanel');
-  var f=document.getElementById('fatPanel');
-  var wb=document.getElementById('weightBtn');
-  var fb=document.getElementById('fatBtn');
-  if(metric==='fat'){
-    w.style.display='none'; f.style.display='block';
-    wb.className=''; fb.className='active';
-  }else{
-    w.style.display='block'; f.style.display='none';
-    wb.className='active'; fb.className='';
-  }
-}
-</script>
-<h2>ПОСЛЕДНИЙ ОТЧЁТ</h2>
-<section class="card">
-<div class="win">
-<div class="mini"><div class="muted">СРЕДНИЙ ВЕС</div><div class="v" id="dashboardAvg">—</div><div class="up" id="dashboardAvgChange">—</div></div>
-<div class="mini"><div class="muted">ТАЛИЯ</div><div class="v" id="dashboardWaist">—</div><div class="up" id="dashboardWaistChange">—</div></div>
-<div class="mini"><div class="muted">ШАГИ</div><div class="v" id="dashboardSteps">—</div><div class="up" id="dashboardStepsChange">—</div></div>
+<div class="trendRow" data-metric="waist">
+<div><div class="trendLabel">ТАЛИЯ</div><div class="trendValue" id="trendWaistValue">—</div><div class="trendDelta" id="trendWaistDelta">—</div></div>
+<div class="trendGraphBox"><svg class="trendGraph" id="trendWaistGraph" viewBox="0 0 150 48" aria-label="Тенденция окружности талии"></svg><div class="trendNote" id="trendWaistNote"></div></div>
 </div>
-<div class="mot"><b id="dashboardReportTitle">Пока нет сохранённых отчётов</b><span id="dashboardReportHint">После сохранения недельный отчёт отобразится здесь.</span></div>
+<div class="trendRow" data-metric="steps">
+<div><div class="trendLabel">ШАГИ</div><div class="trendValue" id="trendStepsValue">—</div><div class="trendDelta" id="trendStepsDelta">—</div></div>
+<div class="trendGraphBox"><svg class="trendGraph" id="trendStepsGraph" viewBox="0 0 150 48" aria-label="Тенденция среднего количества шагов"></svg><div class="trendNote" id="trendStepsNote"></div></div>
+</div>
+<div class="trendStamp"><b id="dashboardReportTitle">Пока нет сохранённых отчётов</b><span id="dashboardReportDate">После сохранения здесь появится последняя точка.</span></div>
 </section>
 <h2>ДО / СЕЙЧАС</h2>
 <section class="card" id="photoCard">
@@ -317,20 +311,31 @@ function weekForCurrentReport(){var all=getReports();for(var i=all.length-1;i>=0
 function numberValue(value){var n=parseFloat(String(value||'').replace(/\s/g,'').replace(',','.'));return Number.isFinite(n)?n:null;}
 function displayValue(value,unit){var raw=String(value||'—').trim();if(!raw||raw==='—')return '—';return raw.replace('.',',')+(unit||'');}
 function reportDelta(current,previous,unit,precision){var a=numberValue(current),b=numberValue(previous);if(a===null||b===null)return '—';var delta=a-b;if(Math.abs(delta)<0.0001)delta=0;var sign=delta>0?'+':delta<0?'−':'';return sign+Math.abs(delta).toFixed(precision).replace('.',',')+(unit||'');}
+function metricSeries(reports,key){
+ var byPeriod={};reports.forEach(function(r){var value=numberValue(r.data&&r.data[key]);if(value!==null)byPeriod[r.week]={value:value,date:r.date};});
+ return Object.keys(byPeriod).map(function(k){return byPeriod[k]}).slice(-16);
+}
+function drawTrend(id,series,color){
+ var svg=document.getElementById(id);svg.innerHTML='';if(!series.length)return;
+ var values=series.map(function(p){return p.value}),min=Math.min.apply(null,values),max=Math.max.apply(null,values),coords=series.map(function(p,i){var x=series.length===1?75:6+i*(138/(series.length-1));var y=max===min?24:42-((p.value-min)/(max-min))*34;return [x,y];});
+ if(coords.length>1){var area=document.createElementNS('http://www.w3.org/2000/svg','path');area.setAttribute('d','M '+coords[0][0]+' 45 L '+coords.map(function(p){return p[0]+' '+p[1]}).join(' L ')+' L '+coords[coords.length-1][0]+' 45 Z');area.setAttribute('fill',color);area.setAttribute('fill-opacity','.13');svg.appendChild(area);var line=document.createElementNS('http://www.w3.org/2000/svg','polyline');line.setAttribute('points',coords.map(function(p){return p.join(',')}).join(' '));line.setAttribute('fill','none');line.setAttribute('stroke',color);line.setAttribute('stroke-width','2.5');line.setAttribute('stroke-linecap','round');line.setAttribute('stroke-linejoin','round');svg.appendChild(line);}
+ var last=document.createElementNS('http://www.w3.org/2000/svg','circle');last.setAttribute('cx',coords[coords.length-1][0]);last.setAttribute('cy',coords[coords.length-1][1]);last.setAttribute('r','3.5');last.setAttribute('fill',color);last.setAttribute('stroke','#fff');last.setAttribute('stroke-width','1.5');svg.appendChild(last);
+}
+function renderMetricTrend(reports,key,valueId,deltaId,graphId,noteId,unit,precision,color,format){
+ var series=metricSeries(reports,key),latest=series[series.length-1],previous=series[series.length-2],value=document.getElementById(valueId),delta=document.getElementById(deltaId),note=document.getElementById(noteId);
+ value.textContent=latest?format(latest.value):'—';delta.textContent=latest&&previous?reportDelta(latest.value,previous.value,unit,precision)+' к предыдущему':'—';
+ drawTrend(graphId,series,color);note.textContent=series.length<2?(series.length?'Нужно ещё одно значение':'Нет данных'):'по сохранённым отчётам';
+}
 function renderDashboard(){
- var all=getReports(),n=count(),latest=all[all.length-1],previous=null;for(var p=all.length-2;p>=0;p--){if(latest&&all[p].week!==latest.week){previous=all[p];break;}}var data=latest&&latest.data||{},before=previous&&previous.data||{};
+ var all=getReports(),n=count(),latest=all[all.length-1];
  document.getElementById('programCount').textContent=Math.min(n,16)+'/16';
  document.getElementById('programCurrentWeek').textContent=n>=16?'16 недель завершено':(n+1)+' неделя';
  var dots=document.getElementById('programDots');dots.innerHTML='';for(var i=1;i<=16;i++){var dot=document.createElement('i');dot.className='dot'+(i<=n?' on':i===n+1?' cur':'');dots.appendChild(dot);}
- var avg=displayValue(data.avg,' кг'),min=displayValue(data.min,' кг'),waist=displayValue(data.waist,' см'),steps=displayValue(data.steps,'');
- document.getElementById('dashboardWeight').textContent=avg;document.getElementById('dashboardMinWeight').textContent=min;document.getElementById('dashboardWeightChange').textContent=reportDelta(data.avg,before.avg,' кг',1);
- document.getElementById('dashboardAvg').textContent=avg;document.getElementById('dashboardAvgChange').textContent=reportDelta(data.avg,before.avg,' кг',1);
- document.getElementById('dashboardWaist').textContent=waist;document.getElementById('dashboardWaistChange').textContent=reportDelta(data.waist,before.waist,' см',1);
- document.getElementById('dashboardSteps').textContent=steps==='—'?'—':Number(steps.replace(/\s/g,'')).toLocaleString('ru-RU');document.getElementById('dashboardStepsChange').textContent=reportDelta(data.steps,before.steps,' шагов',0);
-
+ renderMetricTrend(all,'avg','trendAvgValue','trendAvgDelta','trendAvgGraph','trendAvgNote',' кг',1,'#b68cff',function(v){return v.toFixed(1).replace('.',',')+' кг';});
+ renderMetricTrend(all,'waist','trendWaistValue','trendWaistDelta','trendWaistGraph','trendWaistNote',' см',1,'#f06bc5',function(v){return v.toFixed(1).replace('.',',')+' см';});
+ renderMetricTrend(all,'steps','trendStepsValue','trendStepsDelta','trendStepsGraph','trendStepsNote',' шагов',0,'#55dcb8',function(v){return Math.round(v).toLocaleString('ru-RU');});
  document.getElementById('dashboardReportTitle').textContent=latest?'Сохранён отчёт · неделя '+latest.week+'/16':'Пока нет сохранённых отчётов';
- document.getElementById('dashboardReportHint').textContent=latest?'Показаны ответы из последнего отчёта на этом устройстве.':'После сохранения недельный отчёт отобразится здесь.';
- document.getElementById('dashboardReportDate').textContent=latest?'Последний отчёт · '+new Date(latest.date).toLocaleDateString('ru-RU'):'Ответы появятся после сохранения отчёта.';
+ document.getElementById('dashboardReportDate').textContent=latest?'Последний отчёт · '+new Date(latest.date).toLocaleDateString('ru-RU'):'После сохранения здесь появится последняя точка.';
 }
 function updateCount(){var n=count();document.querySelector('.topReportCTA .mini').textContent='СЛЕДУЮЩИЙ ОТЧЁТ · НЕДЕЛЯ '+Math.min(n+1,16)+' / 16';renderDashboard();}
 form.onsubmit=function(e){e.preventDefault();if(!validStep())return;var f=new FormData(form),d={};f.forEach(function(v,k){d[k]=v});['fatsecret','ease'].forEach(function(k){if(!d[k])d[k]='—'});var week=weekForCurrentReport();if(week>16){alert('16 отчётов уже сохранено.');return;}
