@@ -172,45 +172,11 @@ h2{letter-spacing:.13em!important;color:rgba(214,203,238,.70)!important}
 <button class="active" id="weightBtn" onclick="showMetric('weight')" type="button">ВЕС</button>
 <button id="fatBtn" onclick="showMetric('fat')" type="button">% ЖИРА</button>
 </div>
-<div id="weightPanel">
-<div class="topline">
-<div class="tag">BIO-SCAN</div>
-<div class="signature">by Valeria Trushina</div>
-</div>
-
-
-<section class="card">
-<div class="goalheads"><div><div class="cap">СТАРТ</div><div class="kg">65 кг</div></div><div class="right"><div class="cap">ЦЕЛЬ</div><div class="kg">60 кг</div></div></div>
-<div class="track"><div class="base"></div><div class="fill"></div>
-<i class="old" style="left:9%"></i><i class="old" style="left:17%"></i><i class="old" style="left:25%"></i><i class="old" style="left:31%"></i>
-<div class="lab">63,2 кг</div><i class="now"></i><i class="goal"></i>
-</div>
-<div class="meta"><span>−1,8 кг</span><b>36% пути</b><span>осталось 3,2 кг</span></div>
-<div class="mot"><b>🔥 Уже больше трети пути</b><span>Большая точка — твой вес сейчас. Маленькие точки показывают, где ты была раньше.</span></div>
-<div class="trendBox">
-<div class="trendHead"><b>ТРЕНД ВЕСА · 4 НЕДЕЛИ</b><span class="trendValue">↓ −1,1 кг</span></div>
-<p>Даже если отдельная неделя даст небольшой плюс, FOCUS оценивает общую траекторию, а не один скачок веса.</p>
-</div>
+<div id="weightPanel"><section class="card">
+<div class="goalheads"><div><div class="cap">СРЕДНИЙ ВЕС ПОСЛЕДНЕГО ОТЧЁТА</div><div class="kg" id="dashboardWeight">—</div></div><div class="right"><div class="cap">МИНИМАЛЬНЫЙ ВЕС</div><div class="kg" id="dashboardMinWeight">—</div></div></div>
+<div class="trendBox"><div class="trendHead"><b>ИЗМЕНЕНИЕ К ПРЕДЫДУЩЕМУ ОТЧЁТУ</b><span class="trendValue" id="dashboardWeightChange">—</span></div><p id="dashboardReportDate">Ответы появятся после сохранения отчёта.</p></div>
 </section></div>
-<div id="fatPanel"><section class="card">
-<div class="goalheads">
-<div><div class="cap">СТАРТ</div><div class="kg">27,4%</div></div>
-<div class="right"><div class="cap">ЛУЧШИЙ РЕЗУЛЬТАТ</div><div class="kg">24,8%</div></div>
-</div>
-<div class="track">
-<div class="base"></div>
-<div class="fill" style="width:88%"></div>
-<i class="old" style="left:18%"></i>
-<i class="old" style="left:35%"></i>
-<i class="old" style="left:54%"></i>
-<i class="old" style="left:70%"></i>
-<div class="lab" style="left:88%">25,1%</div>
-<i class="now" style="left:88%"></i>
-<i class="goal" style="left:100%"></i>
-</div>
-<div class="meta"><span>−2,3 п.п.</span><b>текущий 25,1%</b><span>лучший 24,8%</span></div>
-<div class="mot"><b>⭐ Почти лучший результат</b><span>Прошлые значения остаются маленькими точками — так же, как в динамике веса.</span></div>
-</section></div>
+<div id="fatPanel"><section class="card"><div class="cap">% ЖИРА</div><div class="kg" id="dashboardFat">—</div><p class="muted">В недельной форме пока нет поля для процента жира.</p></section></div>
 <script>
 function showMetric(metric){
   var w=document.getElementById('weightPanel');
@@ -226,15 +192,15 @@ function showMetric(metric){
   }
 }
 </script>
-<h2>ЭТА НЕДЕЛЯ</h2>
+<h2>ПОСЛЕДНИЙ ОТЧЁТ</h2>
 <section class="card">
 <div class="win">
-<div class="mini"><div class="muted">ВЕС</div><div class="v">63,2</div><div class="up">↓ 0,4 кг</div></div>
-<div class="mini"><div class="muted">ТАЛИЯ</div><div class="v">71,0</div><div class="up">↓ 1 см</div></div>
-<div class="mini"><div class="muted">ШАГИ</div><div class="v">8 800</div><div class="up">↑ +1 400</div></div>
-<div class="mini"><div class="muted">% ЖИРА</div><div class="v">24,8%</div><div class="up">↓ 0,5 п.п.</div></div>
+<div class="mini"><div class="muted">СРЕДНИЙ ВЕС</div><div class="v" id="dashboardAvg">—</div><div class="up" id="dashboardAvgChange">—</div></div>
+<div class="mini"><div class="muted">ТАЛИЯ</div><div class="v" id="dashboardWaist">—</div><div class="up" id="dashboardWaistChange">—</div></div>
+<div class="mini"><div class="muted">ШАГИ</div><div class="v" id="dashboardSteps">—</div><div class="up" id="dashboardStepsChange">—</div></div>
+<div class="mini"><div class="muted">FATSECRET</div><div class="v" id="dashboardFatsecret">—</div><div class="up">оценка из отчёта</div></div>
 </div>
-<div class="mot"><b>Отличная динамика активности 💪</b><span>В среднем на 1 400 шагов в день больше, чем на прошлой неделе.</span></div>
+<div class="mot"><b id="dashboardReportTitle">Пока нет сохранённых отчётов</b><span id="dashboardReportHint">После сохранения недельный отчёт отобразится здесь.</span></div>
 </section>
 <h2>ДО / СЕЙЧАС</h2>
 <section class="card" id="photoCard">
@@ -247,16 +213,16 @@ function showMetric(metric){
 <div class="muted" style="margin-top:11px">Первое загруженное фото остаётся START. В этой тестовой версии фото хранятся только на устройстве.</div>
 </section>
 <h2>ПРОГРАММА</h2>
-<section class="card"><div class="weektop"><div><div class="big">6/16</div><div class="muted">недель с отчётами</div></div><div class="right"><div class="muted">сейчас</div><div class="week">7 неделя</div></div></div>
-<div class="dots"><i class="dot on"></i><i class="dot on"></i><i class="dot on"></i><i class="dot on"></i><i class="dot on"></i><i class="dot on"></i><i class="dot cur"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></div></section>
+<section class="card"><div class="weektop"><div><div class="big" id="programCount">0/16</div><div class="muted">недель с отчётами</div></div><div class="right"><div class="muted">следующий отчёт</div><div class="week" id="programCurrentWeek">1 неделя</div></div></div>
+<div class="dots" id="programDots"></div></section>
 
 <h2>МОТИВАЦИЯ</h2>
 <section class="card">
 <div class="mot" style="margin-top:0">
-<b id="motTitle">🏆 Исторический минимум — 62,9 кг</b>
-<span id="motText">Ты обновила свой лучший результат. До цели осталось 3,2 кг.</span>
+<b id="motTitle">Твои отчёты сохраняются на этом устройстве</b>
+<span id="motText">Главная страница обновится по последнему сохранённому отчёту.</span>
 </div>
-<div class="muted" style="margin-top:12px">Фраза будет подбираться по реальным результатам недели.</div>
+<div class="muted" style="margin-top:12px">Ответы пока хранятся в этом браузере и не отправляются в Google Sheets.</div>
 </section>
 <script>
 (function(){
@@ -346,7 +312,25 @@ form.querySelectorAll('input[name="kcal"],input[name="avg"],input[name="min"],in
 function clean(v){return String(v||'—').trim().replace(/\\n/g,' ').replace(/\\r/g,' ');}
 function unit(v,u){v=clean(v);return v==='—'?v:v.replace('.',',')+u;}
 function count(){try{return JSON.parse(localStorage.getItem('focus_reports_v16')||'[]').length}catch(e){return 0}}
-function updateCount(){var n=count();document.querySelector('.topReportCTA .mini').textContent='СЛЕДУЮЩИЙ ОТЧЁТ · НЕДЕЛЯ '+Math.min(n+1,16)+' / 16';}
+function numberValue(value){var n=parseFloat(String(value||'').replace(/\s/g,'').replace(',','.'));return Number.isFinite(n)?n:null;}
+function displayValue(value,unit){var raw=String(value||'—').trim();if(!raw||raw==='—')return '—';return raw.replace('.',',')+(unit||'');}
+function reportDelta(current,previous,unit,precision){var a=numberValue(current),b=numberValue(previous);if(a===null||b===null)return '—';var delta=a-b;if(Math.abs(delta)<0.0001)delta=0;var sign=delta>0?'+':delta<0?'−':'';return sign+Math.abs(delta).toFixed(precision).replace('.',',')+(unit||'');}
+function renderDashboard(){
+ var all=getReports(),n=all.length,latest=all[n-1],previous=all[n-2],data=latest&&latest.data||{},before=previous&&previous.data||{};
+ document.getElementById('programCount').textContent=Math.min(n,16)+'/16';
+ document.getElementById('programCurrentWeek').textContent=n>=16?'16 недель завершено':(n+1)+' неделя';
+ var dots=document.getElementById('programDots');dots.innerHTML='';for(var i=1;i<=16;i++){var dot=document.createElement('i');dot.className='dot'+(i<=n?' on':i===n+1?' cur':'');dots.appendChild(dot);}
+ var avg=displayValue(data.avg,' кг'),min=displayValue(data.min,' кг'),waist=displayValue(data.waist,' см'),steps=displayValue(data.steps,''),fatsecret=data.fatsecret&&data.fatsecret!=='—'?data.fatsecret+'/5':'—';
+ document.getElementById('dashboardWeight').textContent=avg;document.getElementById('dashboardMinWeight').textContent=min;document.getElementById('dashboardWeightChange').textContent=reportDelta(data.avg,before.avg,' кг',1);
+ document.getElementById('dashboardAvg').textContent=avg;document.getElementById('dashboardAvgChange').textContent=reportDelta(data.avg,before.avg,' кг',1);
+ document.getElementById('dashboardWaist').textContent=waist;document.getElementById('dashboardWaistChange').textContent=reportDelta(data.waist,before.waist,' см',1);
+ document.getElementById('dashboardSteps').textContent=steps==='—'?'—':Number(steps.replace(/\s/g,'')).toLocaleString('ru-RU');document.getElementById('dashboardStepsChange').textContent=reportDelta(data.steps,before.steps,' шагов',0);
+ document.getElementById('dashboardFatsecret').textContent=fatsecret;document.getElementById('dashboardFat').textContent='—';
+ document.getElementById('dashboardReportTitle').textContent=latest?'Сохранён отчёт · неделя '+latest.week+'/16':'Пока нет сохранённых отчётов';
+ document.getElementById('dashboardReportHint').textContent=latest?'Показаны ответы из последнего отчёта на этом устройстве.':'После сохранения недельный отчёт отобразится здесь.';
+ document.getElementById('dashboardReportDate').textContent=latest?'Последний отчёт · '+new Date(latest.date).toLocaleDateString('ru-RU'):'Ответы появятся после сохранения отчёта.';
+}
+function updateCount(){var n=count();document.querySelector('.topReportCTA .mini').textContent='СЛЕДУЮЩИЙ ОТЧЁТ · НЕДЕЛЯ '+Math.min(n+1,16)+' / 16';renderDashboard();}
 form.onsubmit=function(e){e.preventDefault();if(!validStep())return;var f=new FormData(form),d={};f.forEach(function(v,k){d[k]=v});['fatsecret','ease'].forEach(function(k){if(!d[k])d[k]='—'});var week=count()+1;if(week>16){alert('16 отчётов уже сохранено.');return;}
 var lines=['НЕДЕЛЬНЫЙ ОТЧЁТ · '+week+'/16 НЕДЕЛЯ','',
 '1. Средние ккал за неделю: '+clean(d.kcal),
