@@ -312,8 +312,7 @@ function numberValue(value){var n=parseFloat(String(value||'').replace(/\s/g,'')
 function displayValue(value,unit){var raw=String(value||'—').trim();if(!raw||raw==='—')return '—';return raw.replace('.',',')+(unit||'');}
 function reportDelta(current,previous,unit,precision){var a=numberValue(current),b=numberValue(previous);if(a===null||b===null)return '—';var delta=a-b;if(Math.abs(delta)<0.0001)delta=0;var sign=delta>0?'+':delta<0?'−':'';return sign+Math.abs(delta).toFixed(precision).replace('.',',')+(unit||'');}
 function metricSeries(reports,key){
- var byPeriod={};reports.forEach(function(r){var value=numberValue(r.data&&r.data[key]);if(value!==null)byPeriod[r.week]={value:value,date:r.date};});
- return Object.keys(byPeriod).map(function(k){return byPeriod[k]}).slice(-16);
+ return reports.reduce(function(points,r){var value=numberValue(r.data&&r.data[key]);if(value!==null)points.push({value:value,date:r.date,week:r.week});return points;},[]).slice(-16);
 }
 function drawTrend(id,series,color){
  var svg=document.getElementById(id);svg.innerHTML='';if(!series.length)return;
@@ -323,7 +322,7 @@ function drawTrend(id,series,color){
 }
 function renderMetricTrend(reports,latestReport,key,valueId,deltaId,graphId,noteId,unit,precision,color,format){
  var series=metricSeries(reports,key),latest=series[series.length-1],previous=series[series.length-2],value=document.getElementById(valueId),delta=document.getElementById(deltaId),note=document.getElementById(noteId),hasLatestValue=numberValue(latestReport&&latestReport.data&&latestReport.data[key])!==null;
- value.textContent=latest?format(latest.value):'—';delta.textContent=latest&&previous?reportDelta(latest.value,previous.value,unit,precision)+' к предыдущему':'—';
+ value.textContent=latest?format(latest.value):'—';delta.textContent=latest&&previous?reportDelta(latest.value,previous.value,unit,precision)+' к предыдущему отчёту':'—';
  drawTrend(graphId,series,color);
  if(!hasLatestValue&&latest)note.textContent='Нет данных в последнем отчёте · показана последняя тенденция';
  else note.textContent=series.length<2?(series.length?'Нужно ещё одно значение':'Нет данных'):'по сохранённым отчётам';
