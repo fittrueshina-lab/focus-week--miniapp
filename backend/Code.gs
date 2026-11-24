@@ -1,70 +1,25 @@
-/** FOCUS Sheets receiver v1.7.1 — deploy as Google Apps Script Web App.
- * Script properties: SPREADSHEET_ID, TELEGRAM_BOT_TOKEN.
- * Never put bot token in GitHub or browser code.
- */
-function doPost(e) {
-  const lock = LockService.getScriptLock();
-  try {
-    if (!e || !e.postData || !e.postData.contents) throw Error('Empty request');
-    const body = JSON.parse(e.postData.contents);
-    const identity = verifyTelegram_(String(body.initData || ''));
-    if (!identity || !identity.user || !identity.user.id) throw Error('Unauthorized');
-    if (!lock.tryLock(10000)) throw Error('Busy');
-    try {
-      const sheetId = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID') || '1OalyRj3gxiNr7lJZtFFFWaTESdNSnYQUM6e6wEdk8ks';
-      if (!sheetId) throw Error('Spreadsheet not configured');
-      const sheet = SpreadsheetApp.openById(sheetId).getSheetByName('Недельные отчёты');
-      if (!sheet) throw Error('Sheet not found');
-      const answers = body.answers;
-      if (!Array.isArray(answers) || answers.length !== 11 ||
-          answers.some(v => typeof v !== 'string' || !v.trim() || v.length > 500)) throw Error('Invalid answers');
-      const comment = body.comment;
-      if (typeof comment !== 'string' || !comment.trim() || comment.length > 3000) throw Error('Invalid comment');
-      const requestId = String(body.requestId || '');
-      if (!/^[a-zA-Z0-9_-]{12,80}$/.test(requestId)) throw Error('Invalid request ID');
-      // Durable idempotency: request IDs are stored in column O (15).
-      // A script lock prevents simultaneous duplicate submissions.
-      const lastRow = sheet.getLastRow();
-      if (lastRow > 1) {
-        const ids = sheet.getRange(2, 15, lastRow - 1, 1).getValues();
-        if (ids.some(row => String(row[0]) === requestId)) return json_({ok:true, duplicate:true});
-      }
-      const user = identity.user;
-      const name = [user.first_name || '', user.last_name || ''].join(' ').trim() || user.username || String(user.id);
-      const safe = v => {
-        const s = String(v);
-        return /^[=+@\-\t\r]/.test(s) ? "'" + s : s;
-      };
-      sheet.appendRow([new Date(), safe(name + ' (TG ' + user.id + ')')].concat(answers.map(safe), [safe(comment), requestId]));
-      return json_({ok:true});
-    } finally { lock.releaseLock(); }
-  } catch (err) {
-    return json_({ok:false,error:String(err.message || err)});
-  }
-}
-function json_(obj) {
-  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
-}
-function verifyTelegram_(initData) {
-  if (!initData || initData.length > 12000) return null;
-  const token = PropertiesService.getScriptProperties().getProperty('TELEGRAM_BOT_TOKEN');
-  if (!token) throw Error('Bot token not configured');
-  const pairs = initData.split('&').map(p => {
-    const i = p.indexOf('=');
-    return [decodeURIComponent((i < 0 ? p : p.slice(0,i)).replace(/\+/g,' ')),
-            decodeURIComponent((i < 0 ? '' : p.slice(i+1)).replace(/\+/g,' '))];
-  });
-  const data = {};
-  pairs.forEach(([k,v]) => { if (Object.prototype.hasOwnProperty.call(data,k)) throw Error('Duplicate field'); data[k]=v; });
-  const hash = data.hash;
-  const authDate = Number(data.auth_date);
-  if (!/^[a-f0-9]{64}$/i.test(hash || '') || !Number.isFinite(authDate) ||
-      Math.abs(Date.now()/1000 - authDate) > 3600) return null;
-  const check = pairs.filter(([k]) => k !== 'hash').sort((a,b) => a[0].localeCompare(b[0]))
-    .map(([k,v]) => k + '=' + v).join('\n');
-  const secret = Utilities.computeHmacSha256Signature(token, 'WebAppData');
-  const signature = Utilities.computeHmacSha256Signature(Utilities.newBlob(check).getBytes(), secret)
-    .map(b => ('0' + (b & 255).toString(16)).slice(-2)).join('');
-  if (signature !== hash.toLowerCase()) return null;
-  try { return {user: JSON.parse(data.user || '{}')}; } catch (_) { return null; }
-}
+/** FOCUS v1.8.0 — direct SpreadsheetApp bridge; archive retains legacy service account code. */
+var REPORTS_SPREADSHEET_ID='1C0M094mlXAAwKJ32tUkCq8DEpDLlF8z2tNFbWPDTMLU';
+var REPORTS_SHEET_NAME='Недельные отчёты';
+var REPORT_PERIOD_MS=72*60*60*1000, MAX_REPORT_WEEKS=16, MAX_INIT_DATA_AGE_SECONDS=3600;
+var REPORT_HEADERS=['ID отчёта','Telegram ID','Дата сохранения','Неделя программы','Средние ккал за неделю','Средний вес за неделю, кг','Минимальный вес за неделю, кг','Шея (ОШ), см','Талия (ОТ), см','Бёдра (ОБ), см','Среднее количество шагов','Уровень голода','Самочувствие','Точность FatSecret (1–5)','Лёгкость соблюдения плана (1–5)','Количество тренировок','Месячные с прошлого отчёта','Дата начала месячных','Комментарий'];
+function doGet(e){return jsonOutput_({ok:false,error:'POST_REQUIRED'});}
+function doPost(e){try{var raw=e&&e.postData&&e.postData.contents;if(!raw||raw.length>20000)throw Error('BAD_REQUEST');var req=JSON.parse(raw);if(req.action==='reports')return jsonOutput_({ok:true,reports:readReportsForUser_(verifyTelegramInitData_(req.initData||''))});if(req.action!=='saveReport')throw Error('BAD_REQUEST');var userId=verifyTelegramInitData_(req.initData||''),r=req.report||{},id=cleanText_(r.reportId,80);if(!/^[A-Za-z0-9_-]{8,80}$/.test(id))throw Error('BAD_REPORT');var date=new Date(r.date);if(!Number.isFinite(date.getTime())||date.getTime()>Date.now()+60000)throw Error('BAD_REPORT');var d=r.data||{},row=[id,userId,date.toISOString(),0,numberOrDash_(d.kcal),numberOrDash_(d.avg),numberOrDash_(d.min),numberOrDash_(d.neck),numberOrDash_(d.waist),numberOrDash_(d.hips),numberOrDash_(d.steps),safeSheetText_(d.hunger,100),safeSheetText_(d.feel,100),numberOrDash_(d.fatsecret),numberOrDash_(d.ease),numberOrDash_(d.work),safeSheetText_(d.cycle,100),safeSheetText_(d.cycleDate,40),safeSheetText_(d.comment,5000)];var lock=LockService.getScriptLock();lock.waitLock(10000);try{var rows=readSheetValues_(),entries=[];for(var i=1;i<rows.length;i++){if(String(rows[i][0]||'')===id){if(String(rows[i][1]||'')!==userId)throw Error('BAD_REPORT');return jsonOutput_({ok:true,duplicate:true,reportId:id});}if(String(rows[i][1]||'')===userId)entries.push({row:i+1,date:new Date(rows[i][2]),reportId:String(rows[i][0])});}entries.push({row:-1,date:date,reportId:id});var planned=assignProgramWeeks_(entries);if(!planned[id]||planned[id]>MAX_REPORT_WEEKS)throw Error('LIMIT_REACHED');row[3]=planned[id];appendSheetRow_(row);entries[entries.length-1].row=rows.length+1;var weeks=assignProgramWeeks_(entries);updateWeeks_(entries,weeks);return jsonOutput_({ok:true,reportId:id,week:weeks[id]});}finally{lock.releaseLock();}}catch(err){return jsonOutput_({ok:false,error:publicError_(err)});}}
+function verifyTelegramInitData_(raw){var token=PropertiesService.getScriptProperties().getProperty('TELEGRAM_BOT_TOKEN');if(!token)throw Error('NOT_CONFIGURED');if(!raw||raw.length>4096)throw Error('UNAUTHORIZED');var p=parseQuery_(raw),hash=String(p.hash||'').toLowerCase();if(!/^[a-f0-9]{64}$/.test(hash))throw Error('UNAUTHORIZED');delete p.hash;var check=Object.keys(p).sort().map(function(k){return k+'='+p[k];}).join('\n'),secret=Utilities.computeHmacSha256Signature(token,'WebAppData'),sig=bytesToHex_(Utilities.computeHmacSha256Signature(Utilities.newBlob(check).getBytes(),secret));if(!constantTimeEqual_(sig,hash))throw Error('UNAUTHORIZED');var auth=Number(p.auth_date||0),now=Math.floor(Date.now()/1000);if(!auth||auth>now+60||now-auth>MAX_INIT_DATA_AGE_SECONDS)throw Error('UNAUTHORIZED');var user;try{user=JSON.parse(p.user||'{}');}catch(_){throw Error('UNAUTHORIZED');}var id=user&&user.id!=null?String(user.id):'';if(!/^\d{1,24}$/.test(id))throw Error('UNAUTHORIZED');return id;}
+function readReportsForUser_(userId){var rows=readSheetValues_();if(rows.length<2)return[];return rows.slice(1).filter(function(r){return String(r[1]||'')===userId;}).map(function(r){return{reportId:String(r[0]||''),date:String(r[2]||''),week:Number(r[3])||1,data:{kcal:r[4],avg:r[5],min:r[6],neck:r[7],waist:r[8],hips:r[9],steps:r[10],hunger:r[11],feel:r[12],fatsecret:r[13],ease:r[14],work:r[15],cycle:r[16],cycleDate:r[17],comment:r[18]}};}).sort(function(a,b){return new Date(a.date)-new Date(b.date);});}
+function reportSheet_(){var id=PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID')||REPORTS_SPREADSHEET_ID;var s=SpreadsheetApp.openById(id).getSheetByName(REPORTS_SHEET_NAME);if(!s)throw Error('NOT_CONFIGURED');return s;}
+function initialize(){var s=reportSheet_(),rows=readSheetValues_();if(!rows.length||REPORT_HEADERS.some(function(h,i){return rows[0][i]!==h;}))throw Error('NOT_CONFIGURED');return 'FOCUS report sheet is ready';}
+function readSheetValues_(){var s=reportSheet_(),n=s.getLastRow();if(!n)return [];var rows=s.getRange(1,1,n,19).getValues();if(REPORT_HEADERS.some(function(h,i){return rows[0][i]!==h;}))throw Error('NOT_CONFIGURED');return rows;}
+function appendSheetRow_(row){reportSheet_().appendRow(row);}
+function updateWeeks_(entries,weeks){var s=reportSheet_();entries.filter(function(x){return x.row>1;}).forEach(function(x){s.getRange(x.row,4).setValue(weeks[x.reportId]);});}
+function assignProgramWeeks_(entries){var sorted=entries.slice().sort(function(a,b){return a.date.getTime()-b.date.getTime();}),week=0,anchor=null,result={};sorted.forEach(function(x){var t=x.date.getTime();if(!Number.isFinite(t))throw Error('BAD_REPORT');if(anchor===null||t-anchor>=REPORT_PERIOD_MS){week++;anchor=t;}result[x.reportId]=week;});return result;}
+function parseQuery_(q){var r={};String(q).split('&').forEach(function(x){if(!x)return;var i=x.indexOf('='),k=i<0?x:x.slice(0,i),v=i<0?'':x.slice(i+1);var key=decodeURIComponent(k.replace(/\+/g,' '));if(Object.prototype.hasOwnProperty.call(r,key))throw Error('UNAUTHORIZED');r[key]=decodeURIComponent(v.replace(/\+/g,' '));});return r;}
+function numberOrDash_(v){var t=String(v==null?'':v).trim();if(!t||t==='—'||t==='-')return'—';var n=Number(t.replace(/\s/g,'').replace(',','.'));return Number.isFinite(n)?n:'—';}
+function safeSheetText_(v,max){var t=cleanText_(v,max);return/^[=+\-@]/.test(t)?"'"+t:t;}
+function cleanText_(v,max){return String(v==null?'':v).trim().slice(0,max);}
+function bytesToHex_(a){return a.map(function(b){var n=(b+256)%256;return('0'+n.toString(16)).slice(-2);}).join('');}
+function constantTimeEqual_(a,b){if(a.length!==b.length)return false;var d=0;for(var i=0;i<a.length;i++)d|=a.charCodeAt(i)^b.charCodeAt(i);return d===0;}
+function safeCallback_(x){var c=String(x||'');return/^focusGoogleCallback[A-Za-z0-9_]{1,64}$/.test(c)?c:'';}
+function jsonp_(cb,x){var s=JSON.stringify(x);return cb?ContentService.createTextOutput(cb+'('+s+');').setMimeType(ContentService.MimeType.JAVASCRIPT):jsonOutput_(x);}
+function jsonOutput_(x){return ContentService.createTextOutput(JSON.stringify(x)).setMimeType(ContentService.MimeType.JSON);}
+function publicError_(e){var m=String(e&&e.message||'ERROR');return['UNAUTHORIZED','NOT_CONFIGURED','LIMIT_REACHED','BAD_REQUEST','BAD_REPORT'].indexOf(m)>=0?m:'ERROR';}
