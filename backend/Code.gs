@@ -1,4 +1,4 @@
-/** FOCUS Sheets receiver v1.7.0 — deploy as Google Apps Script Web App.
+/** FOCUS Sheets receiver v1.7.1 — deploy as Google Apps Script Web App.
  * Script properties: SPREADSHEET_ID, TELEGRAM_BOT_TOKEN.
  * Never put bot token in GitHub or browser code.
  */
@@ -60,10 +60,10 @@ function verifyTelegram_(initData) {
   const authDate = Number(data.auth_date);
   if (!/^[a-f0-9]{64}$/i.test(hash || '') || !Number.isFinite(authDate) ||
       Math.abs(Date.now()/1000 - authDate) > 3600) return null;
-  const check = pairs.filter(([k]) => k !== 'hash' && k !== 'signature').sort((a,b) => a[0].localeCompare(b[0]))
+  const check = pairs.filter(([k]) => k !== 'hash').sort((a,b) => a[0].localeCompare(b[0]))
     .map(([k,v]) => k + '=' + v).join('\n');
   const secret = Utilities.computeHmacSha256Signature(token, 'WebAppData');
-  const signature = Utilities.computeHmacSha256Signature(check, secret)
+  const signature = Utilities.computeHmacSha256Signature(Utilities.newBlob(check).getBytes(), secret)
     .map(b => ('0' + (b & 255).toString(16)).slice(-2)).join('');
   if (signature !== hash.toLowerCase()) return null;
   try { return {user: JSON.parse(data.user || '{}')}; } catch (_) { return null; }
